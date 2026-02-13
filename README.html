@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine WiFi Surprise</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @keyframes float {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+  .animate-float { animation: float linear forwards; }
+
+  @keyframes pulse-soft {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,0,0,0.2); }
+    50% { transform: scale(1.03); box-shadow: 0 0 60px rgba(255,0,0,0.5); }
+  }
+  .animate-pulse-soft { animation: pulse-soft 2s infinite; }
+
+  #wifiName::after {
+    content: '|';
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+
+  .heart-shape {
+    position: absolute;
+    font-size: 24px;
+    animation: float linear forwards;
+    opacity: 0.9;
+    text-shadow: 0 0 10px rgba(255,0,0,0.5), 0 0 20px rgba(255,192,203,0.4);
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-pink-300 via-pink-200 to-pink-100 relative overflow-hidden">
+
+<div id="confetti-container" class="pointer-events-none fixed inset-0 z-50"></div>
+
+<div class="bg-gradient-to-r from-pink-50 via-pink-100 to-pink-50 p-10 rounded-3xl shadow-2xl text-center max-w-xl transform hover:scale-105 transition animate-pulse-soft border-4 border-pink-400">
+  <h1 class="text-2xl font-extrabold text-red-600 mb-6 animate-pulse bg-clip-text text-transparent bg-gradient-to-r from-red-400 via-pink-500 to-purple-500">
+    💘 Happy Valentine’s Day! My Love 💘
+  </h1>
+  <p class="text-gray-700 mb-6 text-md">Wi‑Fi surprise! 🎁</p>
+
+  <div id="buttonContainer" class="flex flex-wrap justify-center gap-4 mb-3"></div>
+
+  <div id="surpriseContent" class="mt-6 hidden space-y-6">
+    <p class="text-pink-600 text-xl font-bold" id="wifiName"></p>
+    <p class="text-gray-700 text-md">Enjoy this Valentine’s Day surprise with love, care, and flowers! 🌹</p>
+    <p class="text-gray-700 text-md italic">You are my love, my caring partner, my help, my life. 💖</p>
+    <a href="https://www.sanluxurytrekking.com/assets/front/img/hero.jpg" target="_blank">
+      <img src="https://www.sanluxurytrekking.com/assets/front/img/hero.jpg?auto=format&fit=crop&w=800&q=80"
+      alt="Red rose on brown envelope"
+      class="rounded-xl mx-auto shadow-2xl hover:shadow-pink-500/50 transition duration-500"/>
+    </a>
+  </div>
+</div>
+
+<audio id="romanceAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+
+<script>
+
+const wifiTexts = [
+  { 
+    name: "❤️ Sujita ❤️", 
+    description: "This Wi-Fi is just for you, Sujita! Every connection reminds you of me." 
+  },
+  { 
+    name: "💘 LoveRouter 💘", 
+    description: "Our love flows through this router – strong, fast, and endless!" 
+  },
+  { 
+    name: "🌹 CupidNet 🌹", 
+    description: "Cupid made this network for us – every signal is a little love arrow." 
+  },
+  { 
+    name: "💖 Hugs&WiFi 💖", 
+    description: "Warm hugs and Wi-Fi combined – just like my love for you." 
+  },
+  { 
+    name: "🥰 SweetSurprise 🥰", 
+    description: "A little surprise from me to you – full of sweetness and care!" 
+  },
+  { 
+    name: "💝 MyHeartWiFi 💝", 
+    description: "Every byte of this Wi-Fi carries a piece of my heart for you." 
+  },
+  { 
+    name: "💕 ForeverTogether 💕", 
+    description: "No matter where we are, this connection reminds us we are forever together." 
+  }
+];
+
+const finalSurprise = "🎉 Surprise! You are my everything! 🎉";
+
+const buttonContainer = document.getElementById("buttonContainer");
+const content = document.getElementById("surpriseContent");
+const wifiName = document.getElementById("wifiName");
+const audio = document.getElementById("romanceAudio");
+const confettiContainer = document.getElementById("confetti-container");
+
+let heartInterval = null;
+let typingTimeout = null;
+
+wifiTexts.forEach((wifi, idx) => {
+  const btn = document.createElement("button");
+  btn.textContent = `Surprise ${idx+1}`;
+  btn.className = "bg-gradient-to-r from-red-400 via-pink-500 to-purple-500 text-white px-6 py-3 rounded-full hover:scale-110 transform transition shadow-lg hover:shadow-pink-500/50 focus:outline-none focus:ring-4 focus:ring-pink-300";
+  btn.addEventListener("click", () => revealSurprise(wifi));
+  buttonContainer.appendChild(btn);
+});
+
+function typeWriter(wifi, callback) {
+  if(typingTimeout) clearTimeout(typingTimeout);
+  wifiName.textContent = "";
+  let text = `${wifi.name} - ${wifi.description}`;
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      wifiName.textContent += text.charAt(i);
+      i++;
+      typingTimeout = setTimeout(type, 50);
+    } else {
+      if(callback) typingTimeout = setTimeout(callback, 800);
+    }
+  }
+  type();
+}
+
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.textContent = '❤️';
+  heart.className = 'heart-shape';
+  heart.style.left = Math.random() * 100 + 'vw';
+  heart.style.top = Math.random() * 100 + 'vh';
+  heart.style.fontSize = (18 + Math.random() * 36) + 'px';
+  heart.style.animationDuration = (3 + Math.random() * 3) + 's';
+  confettiContainer.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
+}
+
+function startHeartRain() {
+  if(!heartInterval){
+    heartInterval = setInterval(createHeart, 200);
+  }
+}
+
+function revealSurprise(wifi){
+  content.classList.remove("hidden");
+  if(audio.paused) audio.play();
+  startHeartRain();
+  typeWriter(wifi, () => typeWriter({name: finalSurprise, description: ""}));
+}
+</script>
+
+</body>
+</html>
